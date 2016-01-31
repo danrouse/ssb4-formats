@@ -17,7 +17,7 @@ def get_fighter_paths(base, name):
 
 if __name__ == '__main__':
   util.log_level = util.LOG_INFO
-  paths = get_fighter_paths('S:\\SSB4\\extracted_content', 'cloud')
+  paths = get_fighter_paths('S:\\SSB4\\extracted_content', 'yoshi')
   bones, bone_uids = fmt_vbn.read(paths['vbn'])
   archive = fmt_pac.read(paths['pac'])
 
@@ -26,7 +26,8 @@ if __name__ == '__main__':
   for f, f_data in archive.items():
     m = re.match('.+([A-Z])\d{2}(.+)\.([a-z]{3})', f)
     if m.group(3) == 'omo' and (m.group(1) == 'A'):
-      motion = fmt_omo.read(f_data)
+      util.log('\nReading OMO', f, level=util.LOG_INFO)
+      motion = fmt_omo.read(f_data, debug_bones=bones, debug_bone_ids=bone_uids)
       animation = {
         'name': m.group(2),
         'fps': 30,
@@ -42,6 +43,8 @@ if __name__ == '__main__':
           frame['time'] = i / 30
           if 'pos' in frame:
             frame['pos'] = list(np.add(bones[bone_index]['pos'], frame['pos']))
+          if 'rot' in frame:
+            frame['rot'] = util.quaternion_multiply(frame['rot'], bones[bone_index]['rotq'])
           animation['hierarchy'][bone_index]['keys'].append(frame)
 
       # clean up empty frames

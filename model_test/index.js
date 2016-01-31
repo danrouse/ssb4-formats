@@ -65,6 +65,15 @@ function init() {
     mesh.castShadow = true;
     mesh.rotation.y = -Math.PI/5;
 
+    window.mesh = mesh;
+    window.bone = function(name) {
+      for(var i in mesh.skeleton.bones) {
+        if(mesh.skeleton.bones[i].name.toLowerCase() === name.toLowerCase()) {
+          return mesh.skeleton.bones[i];
+        }
+      }
+    }
+
     helper = new THREE.SkeletonHelper(mesh);
     helper.material.linewidth = 3;
     scene.add(helper);
@@ -105,7 +114,7 @@ function init() {
     requestAnimationFrame(render);
     if(mixer) {
       //console.log('update', dt);
-      mixer.update(clock.getDelta());
+      mixer.update(clock.getDelta() / 2);
       helper.update();
     }
 
